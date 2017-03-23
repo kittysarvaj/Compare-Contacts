@@ -109,7 +109,7 @@ options.hasPhoneNumber = true;
                                                       contactList.userName = MobileNumberExsitDB.userName;
                                                     contactList.userProfileImageBase64 = MobileNumberExsitDB.userImage;
                                                     contactList.userProfileImagetype = MobileNumberExsitDB.userImagetype;
-                                                  FriendContact.Add(contactList);
+                                                  AllContacts.Add(contactList);
                                              
                                                   
                                            
@@ -120,7 +120,7 @@ options.hasPhoneNumber = true;
                                     {
                                         ALLContactList NoContacts = new ALLContactList();
                                         NoContacts.mobileNumber = mobilenumber;
-                                       NoContacts.Add(phonenumber);
+                                       AllContacts.Add(NoContacts);
                                    }
 
 
