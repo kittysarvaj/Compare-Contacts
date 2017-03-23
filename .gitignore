@@ -72,6 +72,7 @@ options.hasPhoneNumber = true;
             {
                 List<ContactList> AllContacts = new List<FriendsContactList>();
 
+List<string> mobileNumbers = new List<string>();
                             foreach (var item in mobilenumberCollection)
                             { 
                                var mobile = Convert.ToString(item);
@@ -99,34 +100,38 @@ options.hasPhoneNumber = true;
                                             mobile.Trim();
                                         }
                                     }
-                                    var mobilenumber = mobile;
-                                    var MobileNumberExsitDB = dbContext.UserTable.Where(m => m.mobileNumber == mobilenumber).FirstOrDefault();
-                                    if (MobileNumberExsitDB != null)
-                                    {
-
-                                                    ALLContactList contactList = new ALLContactList();
-                                                   contactList.userId = MobileNumberExsitDB.userId;
-                                                      contactList.userName = MobileNumberExsitDB.userName;
-                                                    contactList.userProfileImageBase64 = MobileNumberExsitDB.userImage;
-                                                    contactList.userProfileImagetype = MobileNumberExsitDB.userImagetype;
-                                                  AllContacts.Add(contactList);
-                                             
-                                                  
-                                           
-                                            
-                                        }
-                                    }
-                                    else if (mobilenumber != " ")
-                                    {
-                                        ALLContactList NoContacts = new ALLContactList();
-                                        NoContacts.mobileNumber = mobilenumber;
-                                       AllContacts.Add(NoContacts);
-                                   }
-
-
+                                    
+                                    mobileNumbers.Add(mobile);
                                 }
-
-                            }
+                                
+                               
+                                    var mobilenumber = mobile;
+                                    var usersThatExsitInDB = dbContext.UserTable.Where(m => mobileNumbers.Contains(m.mobileNumber));
+                                    
+                                    var numbersThatNotExistsInDB = mobileNumbers.Where(!usersThatExsitInDB.Any(a => a.mobileNumber == a)).ToList();
+                                    
+                                    numbersThatNotExistsInDB.ForEach(mm => {
+                                           if (mm != " ")
+                                          {
+                                                ALLContactList NoContacts = new ALLContactList();
+                                                NoContacts.mobileNumber = mm;
+                                                AllContacts.Add(NoContacts);
+                                          }
+                                    
+                                    });
+                                    
+                                    usersThatExsitInDB.ForEach(MobileNumberExsitDB => {
+                                           ALLContactList contactList = new ALLContactList();
+                                           contactList.userId = MobileNumberExsitDB.userId;
+                                           contactList.userName = MobileNumberExsitDB.userName;
+                                           contactList.userProfileImageBase64 = MobileNumberExsitDB.userImage;
+                                           contactList.userProfileImagetype = MobileNumberExsitDB.userImagetype;
+                                           AllContacts.Add(contactList);
+                                    });
+                                   
+                                    }
+                                   
+                                }
                 
                    
                 }
