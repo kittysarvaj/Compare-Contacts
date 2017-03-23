@@ -1,0 +1,142 @@
+      var phoneNumberCollection = new Array();
+
+function showContacts() {
+var options = new ContactFindOptions();
+  options.filter = "";
+  options.multiple = true;
+  options.desiredFields = [navigator.contacts.fieldType.id,navigator.contacts.fieldType.displayName,  navigator.contacts.fieldType.name, navigator.contacts.fieldType.phoneNumbers];
+options.hasPhoneNumber = true;
+   var fields = [navigator.contacts.fieldType.displayName, navigator.contacts.fieldType.name];
+   navigator.contacts.find(fields, onSuccess, onError, options);
+}
+
+ function onSuccess(contacts) 
+  {
+     // here i have all contacts and i am pushing each number into       "phoneNumberCollection" array//
+  }
+
+ function onError(err)
+ { 
+ }
+
+  self.GetContactsData = function () {
+    self.PhoneNumberCollection = phoneNumberCollection;
+    jQuery.support.cors = true;
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify({mobilecollection:  self.PhoneNumberCollection,}),
+        url: Url + 'api/xxxxxx/xxxxxxxx',
+        success: function (data) {
+            self.items($.map(data, function (item) {
+                return new ContactsModel(item);
+            }));
+        },
+        error: function (err, type, httpStatus) {
+         }
+    })
+
+}
+
+     //Web API
+  [HttpPost]
+    public  IHttpActionResult GetContacts(JObject jsonData)
+    {
+        try
+        {
+            if (jsonData != null)
+            {
+                dynamic json = jsonData;
+
+                string[] mobilenumberCollection = json.mobilecollection.ToObject<string[]>();
+                var getContacts = CBFriends.getAllcontacts(mobilenumberCollection);
+                if (getAllContacts != null)
+                {
+                    return Ok(getAllContacts);
+                }
+                else { return NotFound(); }
+
+            }
+            else {
+                return BadRequest();}
+           }
+        catch (Exception)
+        { throw ex }      
+       }
+       
+       //Method for Checking the Contacts
+         public List<FriendsContactList> getAllcontacts(string[] mobilenumberCollection)
+        {
+            try
+            {
+                List<ContactList> AllContacts = new List<FriendsContactList>();
+
+                            foreach (var item in mobilenumberCollection)
+                            { 
+                               var mobile = Convert.ToString(item);
+                                if (string.IsNullOrEmpty(mobile))
+                                    continue;
+                                mobile = mobile.Replace(" ", "");
+                                mobile = mobile.Replace("-", "");
+                                mobile = mobile.Replace("(", "");
+                                mobile = mobile.Replace(")", "");
+                                mobile.Trim();
+                                int len = mobile.Length;
+                                string mob = mobile.Substring(0, 1);
+                                if (mob!="0")
+                                {
+                                    if (mob!="+")
+                                    {
+                                        if (len <= 10)
+                                        {
+                                            mobile = countrycode + mobile;
+
+                                        }
+                                        else if (len > 10)
+                                        {
+                                            mobile = "+" + mobile;
+                                            mobile.Trim();
+                                        }
+                                    }
+                                    var mobilenumber = mobile;
+                                    var MobileNumberExsitDB = dbContext.UserTable.Where(m => m.mobileNumber == mobilenumber).FirstOrDefault();
+                                    if (MobileNumberExsitDB != null)
+                                    {
+
+                                                    ALLContactList contactList = new ALLContactList();
+                                                   contactList.userId = MobileNumberExsitDB.userId;
+                                                      contactList.userName = MobileNumberExsitDB.userName;
+                                                    contactList.userProfileImageBase64 = MobileNumberExsitDB.userImage;
+                                                    contactList.userProfileImagetype = MobileNumberExsitDB.userImagetype;
+                                                  FriendContact.Add(contactList);
+                                             
+                                                  
+                                           
+                                            
+                                        }
+                                    }
+                                    else if (mobilenumber != " ")
+                                    {
+                                        ALLContactList NoContacts = new ALLContactList();
+                                        NoContacts.mobileNumber = mobilenumber;
+                                       NoContacts.Add(phonenumber);
+                                   }
+
+
+                                }
+
+                            }
+                
+                   
+                }
+                return Contacts;
+            }
+            catch (Exception)
+            {
+
+                throw new Exception("Server Busy! Please try after some time. 309");
+            }
+
+       
+        }
